@@ -47,7 +47,7 @@ class StudentController {
                 });
             }
 
-            EmailController.sendPasswordEmail(student, password);
+            if(email) EmailController.sendPasswordEmail(student, password);
 
             return res.json({message: "Aluno criado", student});
         } catch (error) {
@@ -91,22 +91,12 @@ class StudentController {
             // Mapeia os dados restantes para um formato mais útil
             const students = data.map(row => {
                 const formattedName = row[1].split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-                const nameParts = formattedName.split(' ');
-                const firstName = nameParts[0]; // Primeiro nome
-                const lastName = nameParts[nameParts.length - 1]; // Último sobrenome
-                const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@fatec.sp.gov.br`;
-                const password = PasswordHelper.generateRandomPassword();
+                const password = PasswordHelper.encrypt(row[0].trim()); // senha = ra
 
                 return {
                     ra: row[0].trim(),      // RA
                     name: formattedName,   // Nome
-                    email: email,   // Email
-                    password: password,   // Email
-                    // p1: row[2],      // P1
-                    // p2: row[3],      // P2
-                    // p3: row[4],      // P3
-                    // p4: row[5],      // P4
-                    // average: row[6],      // Média
+                    password: password,   // senha
                 };
             });
 
@@ -114,43 +104,21 @@ class StudentController {
             let existingStudentClass = []; //inscrições que já existem
 
             for (const row of students) {
-                const email = row['email'];
+                const code = row['ra'];
                 // Verifica se o email já existe
-                let student = await Student.findOne({ where: { email } });
+                let student = await Student.findOne({ where: { code } });
 
                 if (student) {
                     existingStudent.push(student)
                 } else{
                     student = await Student.create({
                         name: row['name'],
-                        email: row['email'],
                         password: row['password'], // Defina uma senha padrão ou gere uma
                         user_type: "student",
                         code: row['ra']
                     });
                     EmailController.sendPasswordEmail(student, row['password']);
                 }
-
-                // if(req.body.class_id){
-                //     let thisClass = await Class.findByPk(req.body.class_id);
-                //     let student_class = await StudentClass.findOne({ 
-                //         where: {
-                //             class_id: req.body.class_id,
-                //             student_id: student.id
-                //         } 
-                //     });
-
-                //     if(!thisClass)
-                //         return res.status(400).json({ message: 'Essa turma não existe ou foi excluida' });
-
-                //     if(student_class){
-                //         existingStudentClass.push(student)
-                //     } else {
-                //         await StudentClass.create({
-                //             student_id: student.id, class_id: req.body.class_id, ra: row['ra']
-                //         });
-                //     }
-                // }
             }
 
 

@@ -15,7 +15,7 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY', 'X-Requested-With', 'X-Custom-Header'],
     credentials: true,
     optionsSuccessStatus: 204
-  };
+};
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
