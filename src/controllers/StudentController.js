@@ -121,6 +121,9 @@ class StudentController {
                 }
             }
 
+
+            
+
             // Apagar o arquivo após a leitura
             fs.unlink(req.file.path, (err) => {
                 if (err) {
