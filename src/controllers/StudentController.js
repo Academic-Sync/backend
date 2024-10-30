@@ -6,12 +6,15 @@ const xlsx = require('xlsx');
 const path = require('path');
 const _ = require('lodash');
 const fs = require('fs');
+const discordApiController = require('./DiscordApiController');
 const PasswordHelper= require('../helpers/PasswordHelper'); // Importando o helper
-
+const { Op } = require('sequelize');
 const file = path.resolve('src/file.xlsx');
 
 class StudentController {
     async index(req, res){
+        discordApiController.sendErrorToDiscord("err.message");
+
         try {
             const users = await Student.findAll({
                 where:{
@@ -28,6 +31,16 @@ class StudentController {
     async store(req, res){
         try {
             const {  name, email, hashedPassword, password, code, class_id } = req.body;
+
+            const finStudent = await Student.findOne({
+                where: {
+                    [Op.or]: [{code: code}, {email: email}]
+                }
+            });
+
+            if(finStudent)
+                return res.status(400).json({error: "Aluno Já cadastrado"});
+
             const student = await Student.create({
                 name, email, hashedPassword, user_type: "student", code
             })

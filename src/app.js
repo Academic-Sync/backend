@@ -6,11 +6,12 @@ const classesRoutes = require('./routes/class');
 const studentsRoutes = require('./routes/student');
 const teachersRoutes = require('./routes/teacher');
 const coordinatorsRoutes = require('./routes/coordinator');
+const discordApiController = require('./controllers/DiscordApiController')
 const auth = require('./middlewares/auth');
 const app = express();
 
 const corsOptions = {
-    origin: ['http://127.0.0.1:5500','http://localhost:5500', 'http://localhost:8080', 'http://127.0.0.1:8088'],
+    origin: ['http://127.0.0.1:8082','http://localhost:8082', 'http://localhost:8080', 'http://127.0.0.1:8088'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY', 'X-Requested-With', 'X-Custom-Header'],
     credentials: true,
@@ -20,6 +21,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+
+// Middleware para tratar erros
+app.use((err, req, res, next) => {
+    // Enviar erro para o Discord
+    discordApiController.sendErrorToDiscord(err.message);
+
+    // Responder com erro
+    // res.status(500).json({ message: 'Ocorreu um erro interno.' });
+});
 
 app.get('/', (req, res) => res.json("API Funcionando"));
 
