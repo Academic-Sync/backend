@@ -20,6 +20,24 @@ class TeacherController {
         try {
             const { name, email, password, hashedPassword, code } = req.validatedData;
 
+            const finEmail = await User.findOne({
+                where: {
+                    email: email,
+                }
+            });
+
+            if(finEmail)
+                return res.status(400).json({error: "Esse email já está cadastrado"});
+
+            const finTeacher = await User.findOne({
+                where: {
+                    code: code,
+                }
+            });
+
+            if(finTeacher)
+                return res.status(400).json({error: "Professor já cadastrado com esse código"});
+
             const teacher = await User.create({
                 name, email, password: hashedPassword, user_type: 'teacher', code
             })
@@ -60,15 +78,25 @@ class TeacherController {
             if (!teacher)
                 return res.status(404).json({ error: 'Professor não encontrado' });
 
+            const finEmail = await User.findOne({
+                where: {
+                    email: email,
+                    id: { [Op.ne]: user_id }
+                }
+            });
+
+            if(finEmail)
+                return res.status(400).json({error: "Esse email já está cadastrado"});
+
             const finTeacher = await User.findOne({
                 where: {
-                    [Op.or]: [{code: code}, {email: email}],
+                    code: code,
                     id: { [Op.ne]: user_id }
                 }
             });
 
             if(finTeacher)
-                return res.status(400).json({error: "Professor já cadastrado com esse código ou email"});
+                return res.status(400).json({error: "Professor já cadastrado com esse código"});
 
             // Atualizar o Professor com os novos dados
             await teacher.update({
