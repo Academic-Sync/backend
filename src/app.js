@@ -4,6 +4,7 @@ const cors = require('cors');
 const courseRoutes = require('./routes/course');
 const classesRoutes = require('./routes/class');
 const studentsRoutes = require('./routes/student');
+const advisorsRoutes = require('./routes/advisor');
 const teachersRoutes = require('./routes/teacher');
 const coordinatorsRoutes = require('./routes/coordinator');
 const discordApiController = require('./controllers/DiscordApiController')
@@ -37,6 +38,7 @@ app.get('/', (req, res) => res.json("API Funcionando"));
 app.use('/api/courses', auth, courseRoutes);
 app.use('/api/classes', auth, classesRoutes);
 app.use('/api/students', auth, studentsRoutes);
+app.use('/api/advisors', auth, advisorsRoutes);
 app.use('/api/teachers', auth, teachersRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
 
