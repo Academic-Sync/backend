@@ -19,7 +19,7 @@ class DiscordApiController{
             console.log('Bot do Discord está online!');
         });
     
-        this.client.login("MTMwMDgzNjk3OTg4MTI3OTYyOQ.GG6rsJ.qG_5RVFzfEv6sUuKhZTExHxAWhW5sZ5_GhVEJg");
+        this.client.login(DISCORD_BOT_TOKEN);
     }
     
     async sendErrorToDiscord(errorMessage) {
