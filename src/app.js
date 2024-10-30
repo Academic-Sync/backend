@@ -10,9 +10,10 @@ const coordinatorsRoutes = require('./routes/coordinator');
 const discordApiController = require('./controllers/DiscordApiController')
 const auth = require('./middlewares/auth');
 const app = express();
+require('dotenv').config();
 
 const corsOptions = {
-    origin: ['http://127.0.0.1:8082','http://localhost:8082', 'http://localhost:8080', 'http://127.0.0.1:8088'],
+    origin: process.env.FRONTEND_ORIGINS.split(','),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY', 'X-Requested-With', 'X-Custom-Header'],
     credentials: true,

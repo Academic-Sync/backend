@@ -3,7 +3,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 class DiscordApiController{
     constructor(){
         try {
-            if(process.env.SEND_DISCORD_ERROR){
+            if(process.env.SEND_DISCORD_ERROR == 1){
                 this.client = new Client({
                     intents: [
                         GatewayIntentBits.Guilds,
