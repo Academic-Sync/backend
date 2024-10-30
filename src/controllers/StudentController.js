@@ -172,6 +172,16 @@ class StudentController {
             if (!student)
                 return res.status(404).json({ error: 'Aluno não encontrado' });
 
+            const finStudent = await Student.findOne({
+                where: {
+                    [Op.or]: [{code: code}, {email: email}],
+                    id: { [Op.ne]: user_id }
+                }
+            });
+
+            if(finStudent)
+                return res.status(400).json({error: "Aluno já cadastrado com esse código ou email"});
+
             // Atualizar o Aluno com os novos dados
             await student.update({
                 name, email, password, code
@@ -195,7 +205,7 @@ class StudentController {
 
             return res.json({ message: 'Aluno atualizado com sucesso', student });
         } catch (error) {
-            return res.status(500).json({error: error});
+            return res.status(500).json({error: error.message});
         }
     }
 

@@ -15,7 +15,7 @@ class ClassController {
                     {
                         model: Course,
                         as: 'course',
-                        attributes: ['name', 'is_annual']
+                        attributes: ['name', 'is_annual', 'period']
                     }
                 ]
             });

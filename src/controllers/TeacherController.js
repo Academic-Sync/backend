@@ -1,5 +1,6 @@
 const User = require('../models/User.js')
 const EmailController = require('./EmailController');
+const { Op } = require('sequelize');
 
 class TeacherController {
     async index(req, res){
@@ -59,6 +60,15 @@ class TeacherController {
             if (!teacher)
                 return res.status(404).json({ error: 'Professor não encontrado' });
 
+            const finTeacher = await User.findOne({
+                where: {
+                    [Op.or]: [{code: code}, {email: email}],
+                    id: { [Op.ne]: user_id }
+                }
+            });
+
+            if(finTeacher)
+                return res.status(400).json({error: "Professor já cadastrado com esse código ou email"});
 
             // Atualizar o Professor com os novos dados
             await teacher.update({
