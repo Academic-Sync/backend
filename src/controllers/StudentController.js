@@ -1,5 +1,6 @@
 const Student = require('../models/Student');
 const Class = require('../models/Class');
+const User = require('../models/User');
 const StudentClass = require('../models/StudentClass');
 const EmailController = require('./EmailController');
 const xlsx = require('xlsx');
@@ -32,14 +33,23 @@ class StudentController {
         try {
             const {  name, email, hashedPassword, password, code, class_id } = req.body;
 
+            const finEmail = await User.findOne({
+                where: {
+                    email: email,
+                }
+            });
+
+            if(finEmail)
+                return res.status(400).json({error: "Esse email já está cadastrado"});
+
             const finStudent = await Student.findOne({
                 where: {
-                    [Op.or]: [{code: code}, {email: email}]
+                    code: code,
                 }
             });
 
             if(finStudent)
-                return res.status(400).json({error: "Aluno Já cadastrado"});
+                return res.status(400).json({error: "Aluno já cadastrado com esse RA"});
 
             const student = await Student.create({
                 name, email, hashedPassword, user_type: "student", code
@@ -172,15 +182,26 @@ class StudentController {
             if (!student)
                 return res.status(404).json({ error: 'Aluno não encontrado' });
 
+            
+            const finEmail = await User.findOne({
+                where: {
+                    email: email,
+                    id: { [Op.ne]: user_id }
+                }
+            });
+
+            if(finEmail)
+                return res.status(400).json({error: "Esse email já está cadastrado"});
+
             const finStudent = await Student.findOne({
                 where: {
-                    [Op.or]: [{code: code}, {email: email}],
+                    code: code,
                     id: { [Op.ne]: user_id }
                 }
             });
 
             if(finStudent)
-                return res.status(400).json({error: "Aluno já cadastrado com esse código ou email"});
+                return res.status(400).json({error: "Aluno já cadastrado com esse código"});
 
             // Atualizar o Aluno com os novos dados
             await student.update({
