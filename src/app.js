@@ -12,8 +12,12 @@ const auth = require('./middlewares/auth');
 const app = express();
 require('dotenv').config();
 
+const defaultOrigins = [
+    "https://piardigans.vercel.app", "https://academic-sync.vercel.app"
+];
+
 const corsOptions = {
-    origin: process.env.FRONTEND_ORIGINS.split(','),
+    origin: (process.env.FRONTEND_ORIGINS ? process.env.FRONTEND_ORIGINS.split(',') : defaultOrigins),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY', 'X-Requested-With', 'X-Custom-Header'],
     credentials: true,
