@@ -7,6 +7,7 @@ const studentsRoutes = require('./routes/student');
 const advisorsRoutes = require('./routes/advisor');
 const teachersRoutes = require('./routes/teacher');
 const coordinatorsRoutes = require('./routes/coordinator');
+const authRoutes = require('./routes/auth');
 const discordApiController = require('./controllers/DiscordApiController')
 const auth = require('./middlewares/auth');
 const app = express();
@@ -46,6 +47,7 @@ app.use('/api/students', auth, studentsRoutes);
 app.use('/api/advisors', auth, advisorsRoutes);
 app.use('/api/teachers', auth, teachersRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
+app.use('/api', auth, authRoutes);
 
 // Erro 404
 app.use((req, res, next) => {
