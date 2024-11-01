@@ -24,7 +24,7 @@ class DiscordApiController{
                 this.client.login(this.DISCORD_BOT_TOKEN);
             }
         } catch (error) {
-            console.error(error);
+            // console.error(error);
         }
     }
     
@@ -37,7 +37,7 @@ class DiscordApiController{
                 console.error('Canal não encontrado');
             }
         } catch (error) {
-            console.error('Erro ao enviar mensagem para o Discord:', error);
+            // console.error('Erro ao enviar mensagem para o Discord:', error);
         }
     }
 }

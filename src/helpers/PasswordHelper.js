@@ -21,6 +21,10 @@ class PasswordHelper {
     async encrypt(password){
         return await bcrypt.hash(password, this.saltRounds);
     }
+
+    async compare(password, hashedPassword) {
+        return await bcrypt.compare(password, hashedPassword);
+    }
 }
 
 module.exports = new PasswordHelper();

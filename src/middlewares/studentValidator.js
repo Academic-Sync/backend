@@ -3,7 +3,8 @@ const PasswordHelper = require('../helpers/PasswordHelper');
 module.exports = async (req, res, next) => {
     try {
         let { name, email, password, code, class_id } = req.body;
-        password = email ? code : PasswordHelper.generateRandomPassword(); //se tiver email, cria uma senha. Se não, a senha é o RA
+        password = email.trim() != "" ? PasswordHelper.generateRandomPassword() : code; //se tiver email, cria uma senha. Se não, a senha é o RA
+
         const hashedPassword = await PasswordHelper.encrypt(password);
 
         if(!name || !code)

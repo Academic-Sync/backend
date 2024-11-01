@@ -52,7 +52,7 @@ class StudentController {
                 return res.status(400).json({error: "Aluno já cadastrado com esse RA"});
 
             const student = await Student.create({
-                name, email, hashedPassword, user_type: "student", code
+                name, email, password: hashedPassword, user_type: "student", code
             })
 
             // se class_id foi enviado, insere aluno na turma

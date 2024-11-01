@@ -1,26 +1,36 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const PasswordHelper= require('../helpers/PasswordHelper'); // Importando o helper
+const { Op } = require('sequelize');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 class AuthController {
     // Método para login
     async login(req, res) {
-        const { email, password } = req.body;
+        const { login, password } = req.body;
 
-        if(!email || !password)
-            return res.status(400).json({ error: "Informe o email e senha" });
+        if(!login || !password)
+            return res.status(400).json({ error: "Informe o login e senha" });
 
         try {
-            // Busca o usuário pelo email
-            const user = await User.findOne({ email });
+            const user = await User.findOne({
+                where: {
+                    [Op.or]: [
+                        { code: login },
+                        { email: login }
+                    ]
+                }
+            });
+
+            
             if (!user) {
                 return res.status(400).json({ error: "Usuário e/ou senha incorretos!" });
             }
 
             // Verifica se a senha é válida
-            const validatePassword = bcrypt.compareSync(password, user.password);
+            const validatePassword = await PasswordHelper.compare( password, user.password);
             if (!validatePassword) {
                 return res.status(400).json({ error: "Usuário e/ou senha incorretos!" });
             }
@@ -30,7 +40,14 @@ class AuthController {
                 expiresIn: "1h" // Expira em 1 hora
             });
 
-            res.json({ mensagem: "Login realizado com sucesso!", token, user });
+            const response = {
+                name: user.name,
+                email: user.email,
+                user_type: user.user_type,
+                code: user.code
+            };
+
+            res.json({ mensagem: "Login realizado com sucesso!", token, user: response });
         } catch (error) {
             console.log(error);
             res.status(500).json({ erro: error.message });
