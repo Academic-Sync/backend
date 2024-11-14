@@ -42,7 +42,7 @@ class AdvisorController {
                 return res.status(400).json({error: "Orientador já cadastrado com esse RA"});
 
             const advisor = await Advisor.create({
-                name, email, hashedPassword, user_type: "advisor", code
+                name, email, password: hashedPassword, user_type: "advisor", code
             })
 
             EmailController.sendPasswordEmail(advisor, password);

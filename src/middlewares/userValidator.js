@@ -5,6 +5,13 @@ module.exports = async (req, res, next) => {
     password = password ? password : PasswordHelper.generateRandomPassword();
     const hashedPassword = await PasswordHelper.encrypt(password);
 
+    console.log("");
+    console.log("");
+    console.log(password);
+    console.log("");
+    console.log("");
+    
+
     if(!name || !email || !code)
         return res.status(400).json({error: 'Insira todos os campos'});
 
