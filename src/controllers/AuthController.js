@@ -44,7 +44,8 @@ class AuthController {
                 name: user.name,
                 email: user.email,
                 user_type: user.user_type,
-                code: user.code
+                code: user.code,
+                id: user.id
             };
 
             res.json({ mensagem: "Login realizado com sucesso!", token, user: response });

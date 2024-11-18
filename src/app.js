@@ -6,6 +6,7 @@ const classesRoutes = require('./routes/class');
 const studentsRoutes = require('./routes/student');
 const advisorsRoutes = require('./routes/advisor');
 const teachersRoutes = require('./routes/teacher');
+const activitiesRoutes = require('./routes/activity');
 const coordinatorsRoutes = require('./routes/coordinator');
 const authRoutes = require('./routes/auth');
 const discordApiController = require('./controllers/DiscordApiController')
@@ -46,6 +47,7 @@ app.use('/api/classes', auth, classesRoutes);
 app.use('/api/students', auth, studentsRoutes);
 app.use('/api/advisors', auth, advisorsRoutes);
 app.use('/api/teachers', auth, teachersRoutes);
+app.use('/api/activities', auth, activitiesRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
 app.use('/api', auth, authRoutes);
 
