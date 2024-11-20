@@ -54,6 +54,7 @@ class AuthController {
             res.status(500).json({ erro: error.message });
         }
     }
+    
 
     // Método para verificar perfil protegido
     perfil(req, res) {

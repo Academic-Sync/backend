@@ -49,7 +49,7 @@ app.use('/api/advisors', auth, advisorsRoutes);
 app.use('/api/teachers', auth, teachersRoutes);
 app.use('/api/activities', auth, activitiesRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
-app.use('/api', auth, authRoutes);
+app.use('/api', authRoutes);
 
 // Erro 404
 app.use((req, res, next) => {

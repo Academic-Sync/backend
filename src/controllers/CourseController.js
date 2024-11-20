@@ -4,7 +4,11 @@ const User = require('../models/User.js')
 class CourseController {
     async index(req, res){
         try {
-            const courses = await Course.findAll({
+            const { user_type, id } = req.user; // Pegando o tipo do usuário e ID
+
+            let courses;
+
+            courses = await Course.findAll({
                 include: [
                     {
                         model: User,
@@ -13,6 +17,8 @@ class CourseController {
                     }
                 ]
             });
+            
+            
             return res.json(courses);
         } catch (error) {
             return res.status(500).json({error: error.message});
