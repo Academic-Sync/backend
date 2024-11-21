@@ -72,14 +72,14 @@ class AdvisorController {
 
             // Verificar se o ID do Aluno foi passado
             if (!user_id)
-                return res.status(400).json({ error: 'ID do Aluno não encontrado' });
+                return res.status(400).json({ error: 'ID do Orientador não encontrado' });
 
-            // Buscar o Aluno no banco
+            // Buscar o Orientador no banco
             const advisor = await Advisor.findByPk(user_id);
 
-            // Verificar se o Aluno existe
+            // Verificar se o Orientador existe
             if (!advisor)
-                return res.status(404).json({ error: 'Aluno não encontrado' });
+                return res.status(404).json({ error: 'Orientador não encontrado' });
 
             
             const finEmail = await User.findOne({
@@ -100,14 +100,14 @@ class AdvisorController {
             });
 
             if(finAdvisor)
-                return res.status(400).json({error: "Aluno já cadastrado com esse código"});
+                return res.status(400).json({error: "Orientador já cadastrado com esse código"});
 
-            // Atualizar o Aluno com os novos dados
+            // Atualizar o Orientador com os novos dados
             await advisor.update({
                 name, email, password, code
             });
 
-            return res.json({ message: 'Aluno atualizado com sucesso', advisor });
+            return res.json({ message: 'Orientador atualizado com sucesso', advisor });
         } catch (error) {
             return res.status(500).json({error: error.message});
         }
