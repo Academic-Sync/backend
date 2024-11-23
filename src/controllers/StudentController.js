@@ -20,6 +20,11 @@ class StudentController {
             const users = await Student.findAll({
                 where:{
                     user_type: "student"
+                },
+                include: {
+                    model: Class,
+                    as: 'classes',  // Alias configurado nas associações
+                    through: { attributes: [] }  // Remove os atributos da tabela pivô (StudentClass) no retorno
                 }
             });
 
@@ -84,8 +89,8 @@ class StudentController {
                 where: { id: req.params.user_id },
                 include: {
                     model: Class,
-                    as: 'classes',
-                    through: { attributes: [] } // Remove os atributos da tabela pivô no retorno
+                    as: 'classes',  // Alias configurado nas associações
+                    through: { attributes: [] }  // Remove os atributos da tabela pivô (StudentClass) no retorno
                 }
             });
             return res.json(courses);
@@ -218,7 +223,7 @@ class StudentController {
              // se class_id foi enviado, insere aluno na turma
             if(req.body.class_id){
                 let thisClass = await Class.findByPk(class_id); //class enviada pela requisição
-                
+
                 // verifica se aluno existe
                 if(!thisClass)
                     return res.status(400).json({ message: 'Aluno criado, mas não inserido na turma. Essa turma não existe ou foi excluida' });
@@ -226,13 +231,15 @@ class StudentController {
 
                 // insere aluno na turma
                 await StudentClass.create({
-                    class_id: 12,
-                    student_id: student.id
+                    student_id: student.id,
+                    classe_id: class_id,
                 });
             }
 
             return res.json({ message: 'Aluno atualizado com sucesso', student });
         } catch (error) {
+            console.error(error);
+            
             return res.status(500).json({error: error.message});
         }
     }
