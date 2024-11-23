@@ -11,6 +11,7 @@ const coordinatorsRoutes = require('./routes/coordinator');
 const authRoutes = require('./routes/auth');
 const discordApiController = require('./controllers/DiscordApiController')
 const auth = require('./middlewares/auth');
+const path = require('path');
 const app = express();
 require('dotenv').config();
 
@@ -29,6 +30,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../uploads')));
 
 // Middleware para tratar erros
 app.use((err, req, res, next) => {

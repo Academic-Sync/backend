@@ -23,7 +23,6 @@ class AuthController {
                     ]
                 }
             });
-
             
             if (!user) {
                 return res.status(400).json({ error: "Usuário e/ou senha incorretos!" });
@@ -37,7 +36,7 @@ class AuthController {
 
             // Gera o token JWT
             const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-                expiresIn: "1h" // Expira em 1 hora
+                expiresIn: "24h" // Expira em 1 hora
             });
 
             const response = {

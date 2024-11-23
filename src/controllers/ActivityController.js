@@ -47,9 +47,7 @@ class ActivityController {
         try {
             const { activity_id } = req.params;
             const { name, description, date, time, maximum_grade, teacher_id, class_id } = req.validatedData;
-            const files = req.files.map(file => file.path);
-            const file_path = JSON.stringify(files);
-
+            const newFiles = req.files.map(file => file.path);
             
             // Buscar o activity no banco
             const activity = await Activity.findByPk(activity_id);
@@ -58,9 +56,13 @@ class ActivityController {
             if (!activity)
                 return res.status(404).json({ error: 'Tarefa não encontrada' });
 
+
+            // Concatenar arquivos existentes com novos arquivos
+            const existingFiles = JSON.parse(activity.file_path || '[]');
+            const updatedFiles = [...existingFiles, ...newFiles];
             
             await activity.update({
-                name, description, date, time, maximum_grade, teacher_id, class_id, file_path
+                name, description, date, time, maximum_grade, teacher_id, class_id, file_path: JSON.stringify(updatedFiles)
             });
 
             return res.json({ message: 'Tarefa atualizada com sucesso', activity });
@@ -87,6 +89,41 @@ class ActivityController {
         } catch (error) {
             return res.status(500).json({error: error.message});
         }
+    }
+
+    async removeFile(req, res){
+        try {
+            const { activity_id } = req.params;
+            const { file_name } = req.body;
+        
+            // Buscar a atividade no banco
+            const activity = await Activity.findByPk(activity_id);
+        
+            if (!activity) {
+                return res.status(404).json({ error: 'Tarefa não encontrada' });
+            }
+            
+        
+            // Filtrar os arquivos para remover o especificado
+            const existingFiles = JSON.parse(activity.file_path || '[]');
+            const updatedFiles = existingFiles.filter(file => file !== file_name);
+        
+            // Atualizar os arquivos no banco
+            await activity.update({
+                file_path: JSON.stringify(updatedFiles)
+            });
+        
+            // Remover o arquivo do sistema de arquivos
+            const fs = require('fs');
+            if (fs.existsSync(file_name)) {
+                fs.unlinkSync(file_name);
+            }
+        
+            return res.json({ message: 'Arquivo removido com sucesso', updatedFiles });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+        
     }
 }
 
