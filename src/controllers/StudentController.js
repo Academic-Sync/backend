@@ -71,7 +71,8 @@ class StudentController {
 
                 // insere aluno na turma
                 await StudentClass.create({
-                    student_id: student.id, class_id: class_id, ra: code
+                    student_id: student.id,
+                    classe_id: class_id,
                 });
             }
 
