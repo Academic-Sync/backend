@@ -67,7 +67,7 @@ class AdvisorController {
     async update(req, res) {
         try {
             const { user_id } = req.params;
-            const {  name, email, password, code, class_id } = req.body;
+            const {  name, email, password, hashedPassword, code, class_id } = req.body;
 
 
             // Verificar se o ID do Aluno foi passado
@@ -103,9 +103,16 @@ class AdvisorController {
                 return res.status(400).json({error: "Aluno já cadastrado com esse código"});
 
             // Atualizar o Aluno com os novos dados
-            await advisor.update({
-                name, email, password, code
-            });
+            //se passou senha
+            if(password.trim()){
+                await advisor.update({
+                    name, email, password: hashedPassword, code
+                });
+            }else{
+                await advisor.update({
+                    name, email, code
+                });
+            }
 
             return res.json({ message: 'Aluno atualizado com sucesso', advisor });
         } catch (error) {

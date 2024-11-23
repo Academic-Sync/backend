@@ -45,7 +45,7 @@ class CoordinatorController {
     async update(req, res) {
         try {
             const { user_id } = req.params;
-            const { name, email, hashedPassword, code } = req.validatedData;
+            const { name, email, password, hashedPassword, code } = req.validatedData;
 
             // Verificar se o ID do Coordenador foi passado
             if (!user_id)
@@ -59,9 +59,16 @@ class CoordinatorController {
                 return res.status(404).json({ error: 'Coordenador não encontrado' });
 
             // Atualizar o Coordenador com os novos dados
-            await coordinator.update({
-                name, email, password: hashedPassword, code
-            });
+            //se passou senha
+            if(password.trim()){
+                await coordinator.update({
+                    name, email, password: hashedPassword, code
+                });
+            }else{
+                await coordinator.update({
+                    name, email, code
+                });
+            }
 
             return res.json({ message: 'Coordenador atualizado com sucesso', coordinator });
         } catch (error) {

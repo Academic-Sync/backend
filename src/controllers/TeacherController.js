@@ -1,3 +1,4 @@
+const { password } = require('../config/database.js');
 const User = require('../models/User.js')
 const EmailController = require('./EmailController');
 const { Op } = require('sequelize');
@@ -99,9 +100,16 @@ class TeacherController {
                 return res.status(400).json({error: "Professor já cadastrado com esse código"});
 
             // Atualizar o Professor com os novos dados
-            await teacher.update({
-                name, email, password: hashedPassword, code
-            });
+            //se tiver passado senha
+            if(password.trim()){
+                await teacher.update({
+                    name, email, password: hashedPassword, code
+                });
+            }else{
+                await teacher.update({
+                    name, email, code
+                }); 
+            }
 
             return res.json({ message: 'Professor atualizado com sucesso', teacher });
         } catch (error) {

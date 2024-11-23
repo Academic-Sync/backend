@@ -168,7 +168,7 @@ class StudentController {
     async update(req, res) {
         try {
             const { user_id } = req.params;
-            const {  name, email, password, code, class_id } = req.body;
+            const {  name, email, password, hashedPassword, code, class_id } = req.body;
 
 
             // Verificar se o ID do Aluno foi passado
@@ -204,9 +204,16 @@ class StudentController {
                 return res.status(400).json({error: "Aluno já cadastrado com esse código"});
 
             // Atualizar o Aluno com os novos dados
-            await student.update({
-                name, email, password, code
-            });
+            //se passou senha
+            if(password.trim()){
+                await student.update({
+                    name, email, password: hashedPassword, code
+                });
+            }else{
+                await student.update({
+                    name, email, code
+                });
+            }
 
              // se class_id foi enviado, insere aluno na turma
             if(req.body.class_id){
