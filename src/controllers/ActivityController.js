@@ -19,9 +19,11 @@ class ActivityController {
     async store(req, res){
         try {
             const { name, description, date, time, maximum_grade, teacher_id, class_id } = req.validatedData;
+            const files = req.files.map(file => file.path);
+            const file_path = JSON.stringify(files);
 
             const activity = await Activity.create({
-                name, description, date, time, maximum_grade, teacher_id, class_id
+                name, description, date, time, maximum_grade, teacher_id, class_id, file_path
             })
 
             return res.json({message: "Tarefa Criada", activity});
@@ -45,7 +47,10 @@ class ActivityController {
         try {
             const { activity_id } = req.params;
             const { name, description, date, time, maximum_grade, teacher_id, class_id } = req.validatedData;
+            const files = req.files.map(file => file.path);
+            const file_path = JSON.stringify(files);
 
+            
             // Buscar o activity no banco
             const activity = await Activity.findByPk(activity_id);
 
@@ -55,7 +60,7 @@ class ActivityController {
 
             
             await activity.update({
-                name, description, date, time, maximum_grade, teacher_id, class_id
+                name, description, date, time, maximum_grade, teacher_id, class_id, file_path
             });
 
             return res.json({ message: 'Tarefa atualizada com sucesso', activity });

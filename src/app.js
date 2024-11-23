@@ -51,6 +51,19 @@ app.use('/api/activities', auth, activitiesRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
 app.use('/api', authRoutes);
 
+// Middleware para tratamento de erros do Multer
+app.use((err, req, res, next) => {
+    if (err.name === 'MulterError') {
+        // Erros específicos do Multer
+        return res.status(400).json({ error: err.message });
+    }
+    if (err) {
+        // Outros erros gerais
+        return res.status(500).json({ error: err.message });
+    }
+    next();
+});
+
 // Erro 404
 app.use((req, res, next) => {
     res.status(404).json({
