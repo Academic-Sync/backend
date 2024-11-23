@@ -19,6 +19,7 @@ class Class extends Model {
         this.belongsTo(models.User, { foreignKey: 'teacher_id', as: 'teacher'})
         this.belongsToMany(models.Student, { through: StudentClass, foreignKey: 'classe_id', otherKey: 'student_id', as: 'students'})
         this.belongsTo(models.Course, { foreignKey: 'course_id', as: 'course'})
+        this.hasMany(models.Activity, {foreignKey: 'class_id', as: 'activities'})
 
         // Class.belongsToMany(Student, { through: StudentClass, foreignKey: 'class_id' });
     }

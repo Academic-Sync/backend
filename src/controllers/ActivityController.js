@@ -4,11 +4,41 @@ const Class = require('../models/Class');
 const User = require('../models/User');
 const EmailController = require('./EmailController');
 const { Op } = require('sequelize');
+const Student = require('../models/Student');
+const StudentClass = require('../models/StudentClass');
 
 class ActivityController {
     async index(req, res){
         try {
-            const activities = await Activity.findAll();
+            let activities = await Activity.findAll();
+
+            if(req.user.user_type == 'teacher'){ //professor
+                activities = await Activity.findAll({
+                    where: {
+                        teacher_id: req.user.id
+                    }
+                });
+            }else if(req.user.user_type == 'student'){ //aluno
+                const studentClasses = await StudentClass.findAll({
+                    where: { student_id: req.user.id },
+                    attributes: ['classe_id'] // Pegamos apenas os IDs das classes
+                });
+            
+                // Extraímos os IDs das classes em um array
+                const classIds = studentClasses.map(sc => sc.classe_id);
+            
+                if (classIds.length === 0) {
+                    return res.json([]); // Retorna um array vazio se o aluno não tiver classes
+                }
+            
+                // Busca todas as atividades associadas às classes
+                activities = await Activity.findAll({
+                    where: { class_id: classIds } // Filtra pelo array de IDs
+                });
+                
+            
+            }
+            
 
             return res.json(activities);
         } catch (error) {

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
@@ -13,17 +14,21 @@ module.exports = (req, res, next) => {
         // Remove o "Bearer" se o token for passado assim
         const tokenWithoutBearer = token.startsWith('Bearer ') ? token.slice(7, token.length) : token;
 
-        jwt.verify(tokenWithoutBearer, JWT_SECRET, (err, decoded) => {
+        jwt.verify(tokenWithoutBearer, JWT_SECRET, async (err, decoded) => {
             if (err) {
                 return res.status(401).json({ error: 'Faça login novamente.' });
             }
     
             // Adiciona o usuário decodificado (id, email e tipo) na requisição
-            req.user = {
-                id: decoded.id,
-                email: decoded.email,
-                user_type: decoded.user_type // Inclua o tipo no payload do JWT
-            };
+            // req.user = {
+            //     id: decoded.id,
+            //     email: decoded.email,
+            //     user_type: decoded.user_type // Inclua o tipo no payload do JWT
+            // };
+
+            req.user = await User.findOne({
+                where: { id: decoded.id },
+            });
     
             next();
         });
