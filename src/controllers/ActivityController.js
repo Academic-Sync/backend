@@ -35,8 +35,6 @@ class ActivityController {
                 activities = await Activity.findAll({
                     where: { class_id: classIds } // Filtra pelo array de IDs
                 });
-                
-            
             }
             
 

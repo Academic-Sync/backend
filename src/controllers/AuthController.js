@@ -54,18 +54,38 @@ class AuthController {
         }
     }
     
+    profile(req, res) {
+        return res.json({user: req.user});
+    }
 
-    // Método para verificar perfil protegido
-    perfil(req, res) {
-        const token = req.headers["authorization"];
-        if (!token) return res.status(401).json({ erro: "Token não fornecido" });
+    //atualiza conta
+    async update(req, res) {
+        try {
+            const {  password, hashedPassword, email } = req.body;
 
-        jwt.verify(token, JWT_SECRET, (err, decoded) => {
-            if (err) return res.status(401).json({ erro: "Token inválido" });
+            let user = await User.findByPk(req.user.id);
+            
+            if (!user) {
+                return res.status(400).json({ error: "Dados não encontrados!" });
+            }
 
-            // Retorna o perfil do usuário decodificado do token
-            res.json({ mensagem: "Bem-vindo ao seu perfil!", usuario: decoded });
-        });
+            if(password.trim()){
+                const hashedPassword = await PasswordHelper.encrypt(password);
+
+                await user.update({
+                    email, password: hashedPassword
+                });
+            }else{
+                await user.update({
+                    email
+                });
+            }
+
+            res.json({ message: "Conta atualizada com sucesso!", user });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: error.message });
+        }
     }
 }
 
