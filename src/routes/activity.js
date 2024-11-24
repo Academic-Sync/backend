@@ -12,11 +12,8 @@ router.post('/', upload.array('files[]', 10), activityValidator, ActivityControl
 router.post('/submit', upload.array('files[]', 10), submitActivityValidator, ActivityController.submit);
 router.delete('/remove/submit', ActivityController.removeSubmit);
 router.get('/download-zip/:activity_id/:student_id', ActivityController.downloadFilesStudent)
-
 router.delete('/:activity_id', ActivityController.delete);
-router.delete('/file/:activity_id', function(req, res){
-    return res.send("aasasas")
-});
+router.delete('/file/:activity_id', ActivityController.removeFile);
 router.put('/:activity_id', upload.array('files[]', 10), activityValidator, ActivityController.update);
 router.get('/:activity_id', ActivityController.find);
 

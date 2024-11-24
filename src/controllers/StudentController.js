@@ -103,66 +103,55 @@ class StudentController {
 
     async storeByFile(req, res){
         try {
-            // Certifique-se de que o arquivo foi enviado
-            if (!req.file) 
-                return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+            const { students, class_id } = req.body;
+            let existingStudent = [];
+            let existingStudentClass = [];
+
+            const thisClass = await Class.findByPk(class_id);
+
+            for (const studentData of students) {
+                const { ra, name, password } = studentData;
             
-    
-            const wb = xlsx.readFile(req.file.path); // Utilize o caminho do arquivo enviado
-            const ws = wb.Sheets["Sheet1"];
-            const data = xlsx.utils.sheet_to_json(ws, { header: 1 }); // Captura os dados como matriz
-    
-            // Remove a primeira linha
-            data.shift(); // Remove a primeira linha (cabeçalho)
-            data.shift(); // Remove a segunda linha (cabeçalho)
-
-
-            // Mapeia os dados restantes para um formato mais útil
-            const students = data.map(row => {
-                const formattedName = row[1].split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-                const password = PasswordHelper.encrypt(row[0].trim()); // senha = ra
-
-                return {
-                    ra: row[0].trim(),      // RA
-                    name: formattedName,   // Nome
-                    password: password,   // senha
-                };
-            });
-
-            let existingStudent = [];  //inscrições que já existem
-            let existingStudentClass = []; //inscrições que já existem
-
-            for (const row of students) {
-                const code = row['ra'];
-                // Verifica se o email já existe
-                let student = await Student.findOne({ where: { code } });
+                //verifica se aluno existe
+                let student = await Student.findOne({ where: { code: ra } });
 
                 if (student) {
-                    existingStudent.push(student)
+                    await student.update({ name });
+                    existingStudent.push(student);
+
+                    let studentClass = await StudentClass.findOne({ where: { student_id: student.id } });
+                    if(!studentClass && thisClass){
+                        await StudentClass.create({
+                            student_id: student.id,
+                            classe_id: class_id,
+                        });
+                    }else{
+                        existingStudentClass.push(student);
+                    }
                 } else{
+                    const hashedPassword = await PasswordHelper.encrypt(password)
+
                     student = await Student.create({
-                        name: row['name'],
-                        password: row['password'], // Defina uma senha padrão ou gere uma
+                        name: studentData.name,
+                        password: hashedPassword, // Defina uma senha padrão ou gere uma
                         user_type: "student",
-                        code: row['ra']
+                        code: studentData.ra
                     });
-                    EmailController.sendPasswordEmail(student, row['password']);
+
+                    if(thisClass){
+                        // insere aluno na turma
+                        await StudentClass.create({
+                            student_id: student.id,
+                            classe_id: class_id,
+                        });
+                    }
+                    // EmailController.sendPasswordEmail(student, row['password']);
                 }
             }
 
-            // Apagar o arquivo após a leitura
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Erro ao apagar o arquivo:', err);
-                }
-            });
-
             let message = "Alunos cadastrados";
 
-            if(existingStudentClass.length == students.length)
-                message = "Os alunos já estão cadastrados";
-
-            return res.json({ message, existingStudentClass });
+            return res.json({ message, existingStudent, existingStudentClass });
     
         } catch (error) {
             console.error(error);

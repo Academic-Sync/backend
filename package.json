@@ -30,7 +30,7 @@
     "mysql2": "^3.11.3",
     "nodemailer": "^6.9.15",
     "pg": "^8.13.0",
-    "sequelize": "^6.37.3",
+    "sequelize": "^6.37.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
