@@ -20,6 +20,7 @@ class Activity extends Model{
     static associate(models){
         this.belongsTo(models.User, { foreignKey: 'teacher_id', as: 'teacher'})
         this.belongsTo(models.Class, { foreignKey: 'class_id', as: 'class'})
+        this.hasMany(models.ActivityDelivered, { foreignKey: 'activity_id', as: 'activities_delivered'})
     }
 }
 

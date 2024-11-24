@@ -33,5 +33,6 @@ Student.associate(connection.models);
 Course.associate(connection.models);
 Class.associate(connection.models);
 Activity.associate(connection.models);
+ActivityDelivered.associate(connection.models);
 
 module.exports = connection;

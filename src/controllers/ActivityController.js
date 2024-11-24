@@ -7,6 +7,9 @@ const EmailController = require('./EmailController');
 const { Op } = require('sequelize');
 const Student = require('../models/Student');
 const StudentClass = require('../models/StudentClass');
+const fs = require('fs');
+const archiver = require('archiver');
+const path = require('path');
 
 class ActivityController {
     async index(req, res){
@@ -78,11 +81,71 @@ class ActivityController {
         }
     }
 
+    async removeSubmit(req, res){
+        try {
+            const user = req.user;
+            let activity =  await ActivityDelivered.findOne({
+                where: {
+                    student_id: user.id
+                }
+            })
+
+            if(!activity){
+                return res.status(400).json({message: "Entrega não encontrada"});
+            }
+
+            activity.destroy();
+            
+            return res.json({message: "Entrega removida", activity});
+        } catch (error) {
+            return res.status(500).json({error: error.message});
+        }
+    }
+
     async find(req, res){
         try {
-            const courses = await Activity.findOne({
-                where: { id: req.params.activity_id },
-            });
+            let courses;
+            if(req.user.user_type == "student"){
+                 courses = await Activity.findOne({
+                    where: { id: req.params.activity_id },
+                    include: [
+                        {
+                            model: ActivityDelivered,
+                            as: 'activities_delivered',
+                            attributes: ['file_path'],
+                            include: [
+                                {
+                                    model: Student,
+                                    as: 'student',
+                                    attributes: ['id', 'name'],
+                                    where: {
+                                        id: req.user.id // Filtro para pegar apenas as entregas do aluno específico
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }else{
+                courses = await Activity.findOne({
+                    where: { id: req.params.activity_id },
+                    include: [
+                        {
+                            model: ActivityDelivered,
+                            as: 'activities_delivered',
+                            attributes: ['file_path'],
+                            include: [
+                                {
+                                    model: Student,
+                                    as: 'student',
+                                    attributes: ['id', 'name'],
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+
             return res.json(courses);
         } catch (error) {
             return res.status(500).json({error: error.message});
@@ -170,6 +233,61 @@ class ActivityController {
             return res.status(500).json({ error: error.message });
         }
         
+    }
+
+    async downloadFilesStudent(req, res){
+        try {
+            const activityId = req.params.activity_id;
+            const studentId = req.params.student_id;
+    
+            // Buscar arquivos relacionados no banco de dados
+            const activity = await ActivityDelivered.findOne({
+                as: 'activities_delivered',
+                attributes: ['file_path'],
+                where: { activity_id: activityId },
+            });
+
+            const student = await Student.findByPk(studentId)
+    
+            if (!activity || activity.length === 0) {
+                return res.status(404).json({ error: 'Nenhum arquivo encontrado para esta atividade e aluno.' });
+            }
+    
+            
+            // return res.status(404).json({ activity: activity.file_path });
+            const files = JSON.parse(activity.file_path)
+            
+            // Nome do arquivo ZIP
+            const nameFile = "Tarefa de " + student?.name + " - " + activityId
+            const zipFileName = `${nameFile}.zip`;
+            const outputPath = path.join(__dirname, zipFileName);
+    
+            // Criação do arquivo ZIP
+            const output = fs.createWriteStream(outputPath);
+            const archive = archiver('zip', { zlib: { level: 9 } });
+    
+            output.on('close', () => {
+                res.download(outputPath, zipFileName, () => {
+                    fs.unlinkSync(outputPath); // Exclui o arquivo ZIP após o download
+                });
+            });
+    
+            archive.on('error', (err) => {
+                throw err;
+            });
+    
+            archive.pipe(output);
+    
+            // Adiciona os arquivos ao ZIP
+            files.forEach((file) => {
+                const fileName = path.basename(file); // Extrai o nome do arquivo
+                archive.file(file, { name: fileName });
+            });
+    
+            await archive.finalize();
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 }
 

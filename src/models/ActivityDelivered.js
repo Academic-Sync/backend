@@ -17,7 +17,7 @@ class ActivityDelivered extends Model{
 
     static associate(models){
         this.belongsTo(models.Student, { foreignKey: 'student_id', as: 'student'})
-        this.belongsTo(models.Class, { foreignKey: 'class_id', as: 'class'})
+        this.belongsTo(models.Activity, { foreignKey: 'activity_id', as: 'class'})
     }
 }
 
