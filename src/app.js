@@ -43,7 +43,7 @@ app.use((err, req, res, next) => {
     // res.status(500).json({ message: 'Ocorreu um erro interno.' });
 });
 
-app.get('/', (req, res) => res.json("API Funcionando"));
+app.get('/', (req, res) => res.json("Hello World"));
 
 // Rotas
 app.use('/api/courses', auth, courseRoutes);
