@@ -1,5 +1,6 @@
 const Advisor = require('../models/Advisor');
 const Activity = require('../models/Activity');
+const ActivityDelivered = require('../models/ActivityDelivered');
 const Class = require('../models/Class');
 const User = require('../models/User');
 const EmailController = require('./EmailController');
@@ -55,6 +56,23 @@ class ActivityController {
             })
 
             return res.json({message: "Tarefa Criada", activity});
+        } catch (error) {
+            return res.status(500).json({error: error.message});
+        }
+    }
+
+    async submit(req, res){
+        try {
+            const { activity_id } = req.validatedData;
+            const files = req.files.map(file => file.path);
+            const file_path = JSON.stringify(files);
+            const user = req.user
+
+            const activity = await ActivityDelivered.create({
+                activity_id, file_path, student_id: user.id
+            })
+
+            return res.json({message: "Tarefa Enviada", activity});
         } catch (error) {
             return res.status(500).json({error: error.message});
         }

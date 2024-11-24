@@ -8,6 +8,7 @@ const StudentClass = require('../models/StudentClass');
 const Course = require('../models/Course');
 const Class = require('../models/Class');
 const Activity = require('../models/Activity');
+const ActivityDelivered = require('../models/ActivityDelivered');
 
 const connection = new Sequelize(dbConfig);
 
@@ -23,6 +24,7 @@ StudentClass.init(connection);
 Course.init(connection);
 Class.init(connection);
 Activity.init(connection);
+ActivityDelivered.init(connection);
 
 // Associações
 User.associate(connection.models);
