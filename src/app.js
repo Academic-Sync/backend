@@ -9,6 +9,7 @@ const teachersRoutes = require('./routes/teacher');
 const activitiesRoutes = require('./routes/activity');
 const coordinatorsRoutes = require('./routes/coordinator');
 const authRoutes = require('./routes/auth');
+const publicRoutes = require('./routes/public');
 const discordApiController = require('./controllers/DiscordApiController')
 const auth = require('./middlewares/auth');
 const path = require('path');
@@ -54,6 +55,7 @@ app.use('/api/teachers', auth, teachersRoutes);
 app.use('/api/activities', auth, activitiesRoutes);
 app.use('/api/coordinators', auth, coordinatorsRoutes);
 app.use('/api', authRoutes);
+app.use('/api', publicRoutes);
 
 // Middleware para tratamento de erros do Multer
 app.use((err, req, res, next) => {
