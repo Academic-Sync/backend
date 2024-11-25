@@ -100,7 +100,6 @@ class StudentController {
         }
     }
     
-
     async storeByFile(req, res){
         try {
             const { students, class_id } = req.body;
@@ -120,16 +119,18 @@ class StudentController {
                     existingStudent.push(student);
 
                     let studentClass = await StudentClass.findOne({ where: { student_id: student.id } });
+
                     if(!studentClass && thisClass){
                         await StudentClass.create({
                             student_id: student.id,
                             classe_id: class_id,
                         });
+                        
                     }else{
                         existingStudentClass.push(student);
                     }
                 } else{
-                    const hashedPassword = await PasswordHelper.encrypt(password)
+                    const hashedPassword = await PasswordHelper.encrypt(password) 
 
                     student = await Student.create({
                         name: studentData.name,
@@ -198,17 +199,10 @@ class StudentController {
             if(finStudent)
                 return res.status(400).json({error: "Aluno já cadastrado com esse código"});
 
-            // Atualizar o Aluno com os novos dados
-            //se passou senha
-            if(password.trim()){
-                await student.update({
-                    name, email, password: hashedPassword, code
-                });
-            }else{
-                await student.update({
-                    name, email, code
-                });
-            }
+            await student.update({
+                name, email, code
+            });
+            
 
              // se class_id foi enviado, insere aluno na turma
             if(req.body.class_id){
