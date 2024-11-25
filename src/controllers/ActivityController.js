@@ -203,7 +203,7 @@ class ActivityController {
     async removeFile(req, res){
         try {
             const { activity_id } = req.params;
-            const { file_name } = req.body;
+            const { file_name } = req.params;
         
             // Buscar a atividade no banco
             const activity = await Activity.findByPk(activity_id);
@@ -211,7 +211,6 @@ class ActivityController {
             if (!activity) {
                 return res.status(404).json({ error: 'Tarefa não encontrada' });
             }
-            
         
             // Filtrar os arquivos para remover o especificado
             const existingFiles = JSON.parse(activity.file_path || '[]');
